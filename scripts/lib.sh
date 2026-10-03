@@ -17,9 +17,3 @@ cka_target_node() {
   kubectl get nodes -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | sort | tail -1
 }
 
-# Calico installed from the plain manifest runs calico-node in kube-system; the
-# tigera-operator install runs it in calico-system. Deleting the operator manifest
-# also deletes the crd.projectcalico.org CRDs a manifest install depends on.
-cka_has_manifest_calico() {
-  kubectl -n kube-system get daemonset calico-node >/dev/null 2>&1
-}

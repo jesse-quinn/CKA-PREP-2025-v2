@@ -69,15 +69,12 @@ adjustments built in:
 - Run the scripts as your normal user with a working `~/.kube/config`. Do not prefix them
   with `sudo`: root usually has no kubeconfig, and the labs call `sudo` themselves where they
   need it. Files the questions ask you to save go to `~` (which is `/root` on Killercoda).
-- Node-scoped questions (10, and the node SSH in 8) target `node01` when it exists, otherwise
+- Question 10 targets `node01` when it exists, otherwise
   the last node by name. Set `CKA_NODE=<node>` to choose explicitly; setup prints the choice.
 - Question 5 reuses an existing metrics-server and only removes one it installed itself.
-- Question 8 refuses to run when Calico is already installed from manifest
-  (`kube-system/calico-node`), and its cleanup never deletes the Calico CRDs in that case.
-  Installing the tigera-operator over a manifest install breaks pod networking. Override
-  with `CKA_ALLOW_CNI_REINSTALL=1` only on a disposable cluster.
-- Question 9 needs Debian/Ubuntu (`dpkg`) and Docker; on other distributions setup stops,
-  validate reports SKIP, and cleanup leaves the node untouched.
+- Questions 8 and 9 run as written. Question 8 assumes Cilium on Killercoda with a worker
+  named `node01`, and its cleanup deletes the Calico CRDs; Question 9 needs Debian/Ubuntu
+  (`dpkg`) and Docker. Run them on a cluster you are prepared to rebuild.
 - Question 15 breaks kube-apiserver on the node you run it from. With several control planes
   the others keep serving, so inspect that node with `crictl` and its manifest. Validate checks
   that node's apiserver, and cleanup restores `/root/kube-apiserver.yaml.bak` if the manifest
