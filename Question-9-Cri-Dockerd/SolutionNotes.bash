@@ -1,9 +1,11 @@
 # Install and run cri-dockerd
-sudo dpkg -i cri-dockerd.deb
+sudo dpkg -i ~/cri-dockerd.deb
 sudo systemctl enable --now cri-docker.service
 sudo systemctl status cri-docker.service
 
 # Set sysctl (make persistent)
+# Note: nf_conntrack_max=131072 can be lower than what kube-proxy already set on a
+# node with more than 4 CPUs; outside the exam, check sysctl -n first.
 sudo tee /etc/sysctl.d/kube.conf >/dev/null <<'EOF'
 net.bridge.bridge-nf-call-iptables=1
 net.ipv6.conf.all.forwarding=1

@@ -23,27 +23,27 @@ echo "======================================"
 echo " Validating Question 6: CRDs"
 echo "======================================"
 
-# 1. /root/resources.yaml exists and is not empty
-check "File /root/resources.yaml exists" \
-  test -f /root/resources.yaml
+# 1. ~/resources.yaml exists and is not empty
+check "File ~/resources.yaml exists" \
+  test -f "$HOME/resources.yaml"
 
-check "File /root/resources.yaml is not empty" \
-  test -s /root/resources.yaml
+check "File ~/resources.yaml is not empty" \
+  test -s "$HOME/resources.yaml"
 
-# 2. /root/resources.yaml contains cert-manager CRDs
-check "/root/resources.yaml lists cert-manager CRDs" \
-  bash -c 'grep -qi "cert-manager" /root/resources.yaml'
+# 2. ~/resources.yaml contains cert-manager CRDs
+check "File ~/resources.yaml lists cert-manager CRDs" \
+  bash -c 'grep -qi "cert-manager" "$HOME/resources.yaml"'
 
-# 3. /root/subject.yaml exists and is not empty
-check "File /root/subject.yaml exists" \
-  test -f /root/subject.yaml
+# 3. ~/subject.yaml exists and is not empty
+check "File ~/subject.yaml exists" \
+  test -f "$HOME/subject.yaml"
 
-check "File /root/subject.yaml is not empty" \
-  test -s /root/subject.yaml
+check "File ~/subject.yaml is not empty" \
+  test -s "$HOME/subject.yaml"
 
-# 4. /root/subject.yaml contains subject-related documentation
-check "/root/subject.yaml contains subject specification info" \
-  bash -c 'grep -qi "subject\|organization\|country\|province\|locality" /root/subject.yaml'
+# 4. ~/subject.yaml contains subject-related documentation
+check "File ~/subject.yaml contains subject specification info" \
+  bash -c 'grep -qi "subject\|organization\|country\|province\|locality" "$HOME/subject.yaml"'
 
 echo ""
 echo "Results: $PASS/$TOTAL passed, $FAIL failed"

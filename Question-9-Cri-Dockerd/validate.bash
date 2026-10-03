@@ -23,6 +23,11 @@ echo "======================================"
 echo " Validating Question 9: Cri-Dockerd"
 echo "======================================"
 
+if ! command -v dpkg >/dev/null 2>&1; then
+  echo "  SKIP: no dpkg on this node; this question only runs on Debian/Ubuntu"
+  exit 2
+fi
+
 # 1. cri-dockerd package is installed
 check "cri-dockerd package is installed" \
   bash -c 'dpkg -l cri-dockerd 2>/dev/null | grep -q "^ii"'

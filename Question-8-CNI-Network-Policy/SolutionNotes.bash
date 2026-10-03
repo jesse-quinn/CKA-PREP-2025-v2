@@ -1,3 +1,6 @@
+# WARNING: do not run this on a cluster that already runs Calico from the plain
+# manifest (kube-system/calico-node). The operator install conflicts with it and can
+# break pod networking. Check first: kubectl -n kube-system get ds calico-node
 # Follow the Tigera Calico documentation to install the operator and custom resources
 # See the Calico docs for the custom-resources.yaml file. https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart
 # The custom-resources.yaml file is also here:

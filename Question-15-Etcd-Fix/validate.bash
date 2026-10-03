@@ -2,6 +2,11 @@
 # Validation script for Question 15 - Etcd Fix
 set -uo pipefail
 
+# The lab breaks the apiserver on the node it ran on; check that node, not "any".
+NODE_NAME="$(hostname -s)"
+export NODE_NAME
+export MANIFEST=/etc/kubernetes/manifests/kube-apiserver.yaml
+
 PASS=0
 FAIL=0
 TOTAL=0
@@ -24,22 +29,22 @@ echo " Validating Question 15: Etcd Fix"
 echo "======================================"
 
 # 1. kube-apiserver pod is running
-check "kube-apiserver pod is Running" \
-  bash -c 'kubectl get pods -n kube-system --no-headers 2>/dev/null | grep kube-apiserver | grep -q Running'
+check "kube-apiserver pod on $NODE_NAME is Running" \
+  bash -c 'kubectl get pods -n kube-system --no-headers 2>/dev/null | grep "kube-apiserver-$NODE_NAME " | grep -q Running'
 
 # 2. etcd endpoint uses port 2379 (not 2380)
 check "kube-apiserver --etcd-servers uses port 2379" \
   bash -c '
-    ETCD_SERVERS=$(grep -oP "(?<=--etcd-servers=)\S+" /etc/kubernetes/manifests/kube-apiserver.yaml 2>/dev/null || \
-                   kubectl get pod -n kube-system -l component=kube-apiserver -o jsonpath="{.items[0].spec.containers[0].command}" 2>/dev/null | grep -oP "(?<=--etcd-servers=)\S+")
+    ETCD_SERVERS=$(sudo cat "$MANIFEST" 2>/dev/null | grep -oP "(?<=--etcd-servers=)\S+" || \
+                   kubectl get pod -n kube-system "kube-apiserver-$NODE_NAME" -o jsonpath="{.spec.containers[0].command}" 2>/dev/null | grep -oP "(?<=--etcd-servers=)\S+")
     echo "$ETCD_SERVERS" | grep -q ":2379"
   '
 
 # 3. etcd endpoint does NOT use port 2380
 check "kube-apiserver --etcd-servers does NOT use port 2380" \
   bash -c '
-    ETCD_SERVERS=$(grep -oP "(?<=--etcd-servers=)\S+" /etc/kubernetes/manifests/kube-apiserver.yaml 2>/dev/null || echo "")
-    ! echo "$ETCD_SERVERS" | grep -q ":2380"
+    ETCD_SERVERS=$(sudo cat "$MANIFEST" 2>/dev/null | grep -oP "(?<=--etcd-servers=)\S+")
+    [[ -n "$ETCD_SERVERS" ]] && ! echo "$ETCD_SERVERS" | grep -q ":2380"
   '
 
 # 4. kubectl can communicate with the cluster
