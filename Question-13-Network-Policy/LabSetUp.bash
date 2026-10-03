@@ -124,4 +124,4 @@ spec:
 EOF
 
 cd /
-echo "[OK] Lab setup complete. Three network policy files created in /root/network-policies."
+echo "[OK] Lab setup complete. Three network policy files created in ${WORKDIR:-$PWD/network-policies}."

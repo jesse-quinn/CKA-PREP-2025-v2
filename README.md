@@ -60,6 +60,32 @@ The script outputs `PASS` or `FAIL` for each check, with a final score summary. 
 
 ---
 
+## Running on Your Own Multi-Node kubeadm Cluster
+
+The labs were written for Killercoda (`controlplane` + `node01`, logged in as root). They
+also run on a self-managed kubeadm cluster as a non-root user with sudo, with these
+adjustments built in:
+
+- Run the scripts as your normal user with a working `~/.kube/config`. Do not prefix them
+  with `sudo`: root usually has no kubeconfig, and the labs call `sudo` themselves where they
+  need it. Files the questions ask you to save go to `~` (which is `/root` on Killercoda).
+- Question 10 targets `node01` when it exists, otherwise
+  the last node by name. Set `CKA_NODE=<node>` to choose explicitly; setup prints the choice.
+- Question 5 reuses an existing metrics-server and only removes one it installed itself.
+- Questions 8 and 9 run as written. Question 8 assumes Cilium on Killercoda with a worker
+  named `node01`, and its cleanup deletes the Calico CRDs; Question 9 needs Debian/Ubuntu
+  (`dpkg`) and Docker. Run them on a cluster you are prepared to rebuild.
+- Question 15 breaks kube-apiserver on the node you run it from. With several control planes
+  the others keep serving, so inspect that node with `crictl` and its manifest. Validate checks
+  that node's apiserver, and cleanup restores `/root/kube-apiserver.yaml.bak` if the manifest
+  is still broken. Take an etcd snapshot first if the cluster matters to you.
+- Question 1 works without a StorageClass. Question 2 needs `helm`; Question 12 needs an
+  ingress controller to make the curl work (validate does not check it); Question 11 leaves
+  the Gateway API CRDs installed.
+- `validate-question.sh all` and `cleanup-question.sh all` cover every question directory.
+
+---
+
 ## Simulated Exam Desktop (VSCodium)
 
 You can use **VSCodium** (an open-source VS Code build) inside the Killercoda simulated desktop to edit files in a familiar IDE environment, similar to what is available in the real CKA exam.

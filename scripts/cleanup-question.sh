@@ -65,10 +65,11 @@ INPUT="$*"
 
 if [[ "$INPUT" == "all" ]]; then
   echo "Cleaning up all questions..."
-  for i in $(seq 1 17); do
-    QUESTION_DIR=$(resolve_question_dir "$i")
+  # Discover every question so new ones are never silently skipped; fd 3 keeps
+  # child scripts from draining the list on stdin.
+  while IFS= read -r -u 3 QUESTION_DIR; do
     [[ -n "$QUESTION_DIR" ]] && run_cleanup "$QUESTION_DIR" || true
-  done
+  done 3< <(find "$BASE_DIR" -maxdepth 1 -type d -name "Question-*" | sort -V)
   echo ""
   echo "All cleanups complete."
 else

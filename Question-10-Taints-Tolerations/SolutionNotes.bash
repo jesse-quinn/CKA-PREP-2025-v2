@@ -1,4 +1,4 @@
-# Taint node01
+# Taint node01 (or the target node LabSetUp.bash printed)
 kubectl taint nodes node01 PERMISSION=granted:NoSchedule
 
 # Pod that tolerates the taint
@@ -11,6 +11,10 @@ spec:
   containers:
   - name: nginx
     image: nginx
+  # A toleration only permits the tainted node; it does not attract the pod there.
+  # Where other nodes are schedulable, pin it explicitly.
+  nodeSelector:
+    kubernetes.io/hostname: node01
   tolerations:
   - key: PERMISSION
     operator: Equal

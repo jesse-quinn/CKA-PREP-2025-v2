@@ -1,5 +1,5 @@
 # List cert-manager CRDs and save
-kubectl get crd | grep cert-manager | tee /root/resources.yaml
+kubectl get crd | grep cert-manager | tee ~/resources.yaml
 
 # Save spec subject explain output
-kubectl explain certificate.spec.subject | tee /root/subject.yaml
+kubectl explain certificate.spec.subject | tee ~/subject.yaml

@@ -13,7 +13,8 @@ spec:
     requests:
       storage: 250Mi
   storageClassName: # Set this to the default storage class name. Some are "standard" some "local-path" etc. Check with "kubectl get storageclass". 
-                    # If you used volumeName above, storageClassName can be left blank and it will bind to the PV by name. If you leave volumeName blank, then storageClassName must match the PV's storageClassName for binding to occur.
+                    # storageClassName must match the PV's class even when volumeName is set; volumeName
+                    # picks the PV, it does not bypass the class check. Check with: kubectl get pv mariadb-pv
 EOF
 kubectl apply -f pvc.yaml
 kubectl get pvc mariadb -n mariadb

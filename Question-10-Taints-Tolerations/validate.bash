@@ -1,6 +1,9 @@
 #!/bin/bash
 # Validation script for Question 10 - Taints & Tolerations
 set -uo pipefail
+source "$(dirname "${BASH_SOURCE[0]}")/../scripts/lib.sh"
+NODE="$(cka_target_node)"
+export NODE
 
 PASS=0
 FAIL=0
@@ -23,18 +26,18 @@ echo "============================================="
 echo " Validating Question 10: Taints & Tolerations"
 echo "============================================="
 
-# 1. node01 has the taint PERMISSION=granted:NoSchedule
-check "node01 has taint PERMISSION=granted:NoSchedule" \
+# 1. the target node has the taint PERMISSION=granted:NoSchedule
+check "$NODE has taint PERMISSION=granted:NoSchedule" \
   bash -c '
-    kubectl describe node node01 2>/dev/null | grep -q "PERMISSION=granted:NoSchedule"
+    kubectl describe node "$NODE" 2>/dev/null | grep -q "PERMISSION=granted:NoSchedule"
   '
 
-# 2. A pod exists that tolerates the taint and is scheduled on node01
+# 2. A pod exists that tolerates the taint
 check "A pod with toleration for PERMISSION=granted:NoSchedule exists" \
   bash -c '
     # Check all pods for the toleration
     kubectl get pods -A -o json 2>/dev/null | python3 -c "
-import json, sys
+import json, os, sys
 data = json.load(sys.stdin)
 for pod in data[\"items\"]:
     ns = pod[\"metadata\"][\"namespace\"]
@@ -51,7 +54,7 @@ sys.exit(1)
 check "Tolerating pod is in Running state" \
   bash -c '
     kubectl get pods -A -o json 2>/dev/null | python3 -c "
-import json, sys
+import json, os, sys
 data = json.load(sys.stdin)
 for pod in data[\"items\"]:
     ns = pod[\"metadata\"][\"namespace\"]
@@ -65,11 +68,11 @@ for pod in data[\"items\"]:
 sys.exit(1)
 "'
 
-# 4. The tolerating pod is on node01
-check "Tolerating pod is scheduled on node01" \
+# 4. The tolerating pod is on the target node
+check "Tolerating pod is scheduled on $NODE" \
   bash -c '
     kubectl get pods -A -o json 2>/dev/null | python3 -c "
-import json, sys
+import json, os, sys
 data = json.load(sys.stdin)
 for pod in data[\"items\"]:
     ns = pod[\"metadata\"][\"namespace\"]
@@ -79,7 +82,7 @@ for pod in data[\"items\"]:
     for t in tolerations:
         if t.get(\"key\") == \"PERMISSION\" and t.get(\"value\") == \"granted\" and t.get(\"effect\") == \"NoSchedule\":
             node = pod[\"spec\"].get(\"nodeName\", \"\")
-            if \"node01\" in node:
+            if node == os.environ[\"NODE\"]:
                 sys.exit(0)
 sys.exit(1)
 "'

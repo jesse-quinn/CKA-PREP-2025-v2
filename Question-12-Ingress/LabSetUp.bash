@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: echo
-        image: gcr.io/google_containers/echoserver:1.10
+        image: registry.k8s.io/echoserver:1.10
         ports:
         - containerPort: 8080
 EOF

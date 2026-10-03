@@ -35,21 +35,21 @@ check "Helm repo 'argocd' is added" \
 check "Helm repo URL is correct (argoproj.github.io/argo-helm)" \
   bash -c 'helm repo list 2>/dev/null | grep argocd | grep -q "https://argoproj.github.io/argo-helm"'
 
-# 4. /root/argo-helm.yaml exists
-check "File /root/argo-helm.yaml exists" \
-  test -f /root/argo-helm.yaml
+# 4. ~/argo-helm.yaml exists
+check "File ~/argo-helm.yaml exists" \
+  test -f "$HOME/argo-helm.yaml"
 
-# 5. /root/argo-helm.yaml is not empty
-check "File /root/argo-helm.yaml is not empty" \
-  test -s /root/argo-helm.yaml
+# 5. ~/argo-helm.yaml is not empty
+check "File ~/argo-helm.yaml is not empty" \
+  test -s "$HOME/argo-helm.yaml"
 
 # 6. The generated manifest references argocd namespace
 check "Manifest references argocd namespace" \
-  bash -c 'grep -q "namespace.*argocd\|argocd" /root/argo-helm.yaml'
+  bash -c 'grep -q "namespace.*argocd\|argocd" "$HOME/argo-helm.yaml"'
 
 # 7. No CRD resources in the generated YAML
 check "No CRD kind in generated manifest (CRDs skipped)" \
-  bash -c '! grep -q "kind: CustomResourceDefinition" /root/argo-helm.yaml'
+  bash -c '! grep -q "kind: CustomResourceDefinition" "$HOME/argo-helm.yaml"'
 
 echo ""
 echo "Results: $PASS/$TOTAL passed, $FAIL failed"

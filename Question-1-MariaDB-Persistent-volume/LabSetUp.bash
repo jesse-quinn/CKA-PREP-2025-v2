@@ -7,8 +7,10 @@ kubectl create ns mariadb --dry-run=client -o yaml | kubectl apply -f -
 # Query for default storage class to ensure PV uses correct class for binding
 default_sc=$(kubectl get storageclass -o jsonpath='{.items[?(@.metadata.annotations.storageclass\.kubernetes\.io/is-default-class=="true")].metadata.name}')
 if [ -z "$default_sc" ]; then
-  default_sc="standard"
-  echo "No default StorageClass detected, using 'standard' as fallback."
+  # With no default StorageClass a PVC that omits storageClassName gets class "",
+  # so the PV must also carry "" for the two to bind.
+  default_sc=""
+  echo "No default StorageClass detected; PV will have no class."
 else
   echo "Default StorageClass detected: $default_sc"
 fi
@@ -26,9 +28,10 @@ spec:
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: $default_sc  # Use default or fallback storage class so PVC without storageClassName binds
+  storageClassName: "$default_sc"  # Use default or fallback storage class so PVC without storageClassName binds
   hostPath:
     path: /mnt/data/mariadb
+    type: DirectoryOrCreate
 EOF
 
 echo "Creating initial PVC..."
